@@ -1,6 +1,4 @@
-# Becca's HTTP Server ![travis](https://travis-ci.org/beccanelson/http-server.svg?branch=master)
-
-This is a simple HTTP server written in Java and tested with [Cucumber](http://cucumber.io). 
+# Becca and Tom's Tic Tac Toe Server
 
 ## Dependencies:
 
@@ -16,7 +14,7 @@ To install Java: Download the most recent JDK from [Oracle](http://www.oracle.co
 
 With dependencies installed:
 ```
-git clone https://github.com/beccanelson/http-server.git
+git clone https://github.com/beccanelson/tic-tac-toe-as-a-service.git
 cd http-server
 mvn package
 java -jar target/http-server-0.0.1.jar -p <port number> (default is 5000)
