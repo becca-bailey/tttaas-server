@@ -3,15 +3,12 @@ package com.server;
 import com.server.controller.Controller;
 import com.server.request.Request;
 import com.server.routing.Route;
-import com.server.routing.RouteInitializer;
-import com.server.routing.Router;
 import com.server.utilities.Response;
 import com.server.utilities.exceptions.RouterException;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Properties;
 import java.util.function.Supplier;
 
 class ServerRunner implements Runnable {
@@ -22,6 +19,26 @@ class ServerRunner implements Runnable {
     ServerRunner(int port, File rootDirectory) {
         this.serverPort = port;
         this.rootDirectory = rootDirectory;
+    }
+
+    @Override
+    public void run() {
+        while (running) {
+            try {
+                ServerSocket serverSocket = new ServerSocket(serverPort);
+                Socket clientSocket = serverSocket.accept();
+                DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
+                BufferedReader in =
+                        new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                System.out.println("Server is running on port " + serverPort + "\n");
+
+                respondToRequest(out, in);
+                clientSocket.close();
+                serverSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private String getFullRequest(BufferedReader in) throws IOException {
@@ -39,43 +56,30 @@ class ServerRunner implements Runnable {
         byte[] response = new byte[0];
         Request request = new Request(getFullRequest(in));
         try {
-            loadProperties();
-            ServerConfig.router = new Router(ServerConfig.rootDirectory);
-            addRoutes(ServerConfig.router);
-            Route route = ServerConfig.router.getExistingRoute(request.url());
-            Controller controller = ServerConfig.router.getControllerForRequest(route);
+            Route route = routeForUrl(request.url());
             ResponseData responseData = new ResponseData(request, route);
+            Controller controller = controllerForRoute(route);
             controller.sendResponseData(responseData);
-            Supplier<byte[]> controllerAction = ServerConfig.router.getControllerAction(controller, request.method());
+            Supplier<byte[]> controllerAction = getControllerActionForRequest(controller, request.method());
             response = getResponse(controllerAction);
         } catch (RouterException e) {
             System.err.println(e.getMessage());
             response = Response.notFound.getBytes();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            System.err.println("Error loading router. Make sure routesClass is defined in config.properties and implements com.rnelson.server.RouteInitializer");
         }
         out.write(response);
         out.close();
     }
 
-    private void addRoutes(Router router) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        Class initializerClass = Class.forName(ServerConfig.routesClass);
-        RouteInitializer initializer = (RouteInitializer) initializerClass.newInstance();
-        initializer.initializeRoutes(router);
+    private Route routeForUrl(String url) throws RouterException {
+        return ServerConfig.router.getExistingRoute(url);
     }
 
-    private void loadProperties() throws IOException {
-        Properties config = new Properties();
-        String filename = "config.properties";
-        try {
-            InputStream input = new FileInputStream(rootDirectory.getPath() + "/config.properties");
-            config.load(input);
-            ServerConfig.packageName = config.getProperty("packageName");
-            ServerConfig.routesClass = config.getProperty("routesClass");
-            input.close();
-        } catch (Exception e) {
-            System.err.println("Properties not found");
-        }
+    private Controller controllerForRoute(Route route) throws RouterException {
+        return ServerConfig.router.getControllerForRequest(route);
+    }
+
+    private Supplier<byte[]> getControllerActionForRequest(Controller controller, String method) {
+        return ServerConfig.router.getControllerAction(controller, method);
     }
 
     private byte[] getResponse(Supplier<byte[]> supplier) {
@@ -95,25 +99,5 @@ class ServerRunner implements Runnable {
 
     public Boolean isRunning() {
         return running;
-    }
-
-    @Override
-    public void run() {
-        while (running) {
-            try {
-                    ServerSocket serverSocket = new ServerSocket(serverPort);
-                    Socket clientSocket = serverSocket.accept();
-                    DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
-                    BufferedReader in =
-                            new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                    System.out.println("Server is running on port " + serverPort + "\n");
-
-                    respondToRequest(out, in);
-                    clientSocket.close();
-                    serverSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }
