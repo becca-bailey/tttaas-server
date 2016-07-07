@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.rnelson.server</groupId>
-    <artifactId>http-server</artifactId>
+    <groupId>becca-tom</groupId>
+    <artifactId>server</artifactId>
     <version>0.0.1</version>
     <packaging>jar</packaging>
     <name>HTTP Server</name>
@@ -55,7 +55,7 @@
                         <index>true</index>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.rnelson.server.Server</mainClass>
+                            <mainClass>com.server.Server</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
