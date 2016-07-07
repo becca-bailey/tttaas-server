@@ -1,13 +1,13 @@
 package com.rnelson.server.routing;
 
-import application.Config;
 import com.rnelson.server.Controller;
+import com.rnelson.server.ServerConfig;
+import com.rnelson.server.content.Directory;
 import com.rnelson.server.content.FileHandler;
 import com.rnelson.server.request.Credentials;
 import com.rnelson.server.utilities.SharedUtilities;
-import com.rnelson.server.utilities.http.HttpMethods;
-import com.rnelson.server.content.Directory;
 import com.rnelson.server.utilities.exceptions.RouterException;
+import com.rnelson.server.utilities.http.HttpMethods;
 
 import java.io.File;
 import java.util.HashMap;
@@ -54,7 +54,7 @@ public class Router {
     }
 
     public void addFileRoutes() {
-        Directory directory = new Directory(Config.publicDirectory);
+        Directory directory = new Directory(ServerConfig.publicDirectory);
         directory.addFileRoutes();
     }
 
@@ -109,7 +109,7 @@ public class Router {
     }
 
     private Boolean checkCredentials(Credentials credentials) {
-        return credentials.isUsername(Config.username) && credentials.isPassword(Config.password);
+        return credentials.isUsername(ServerConfig.username) && credentials.isPassword(ServerConfig.password);
     }
 
     public Supplier<byte[]> getControllerAction(Controller controller, String method) {
@@ -126,7 +126,7 @@ public class Router {
     }
 
     private String getPackageNameFromFileName(String fileName) {
-        return Config.packageName + ".controllers." + SharedUtilities.findMatch("^\\w+", fileName, 0);
+        return ServerConfig.packageName + ".controllers." + SharedUtilities.findMatch("^\\w+", fileName, 0);
     }
 
     public String expectedControllerClass(Route route){

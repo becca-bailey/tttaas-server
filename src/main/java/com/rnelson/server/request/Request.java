@@ -1,6 +1,6 @@
 package com.rnelson.server.request;
 
-import application.Config;
+import com.rnelson.server.ServerConfig;
 import com.rnelson.server.content.FileHandler;
 import com.rnelson.server.utilities.SharedUtilities;
 
@@ -16,7 +16,6 @@ public class Request {
     public Request(String fullRequestFromServer) {
         this.request = fullRequestFromServer;
         header = getRequestHeader();
-        logRequest();
     }
 
     public String url() {
@@ -91,7 +90,7 @@ public class Request {
     public void logRequest() {
         Boolean logfileCreated = false;
         String requestLine = getRequestLine();
-        File logs = new File(Config.logfilePath);
+        File logs = new File(ServerConfig.logfilePath);
         try {
             logfileCreated = logs.createNewFile();
         } catch (IOException e) {
@@ -100,7 +99,7 @@ public class Request {
         FileHandler logHandler = new FileHandler(logs);
         logHandler.addFileContent(requestLine + "\n");
         if (logfileCreated) {
-            System.out.println("New logfile created at " + Config.logfilePath);
+            System.out.println("New logfile created at " + ServerConfig.logfilePath);
         }
     }
 
