@@ -1,12 +1,9 @@
 package com.server;
 
-import com.server.routing.RouteInitializer;
+import com.server.content.FileHandler;
 import com.server.routing.Router;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Properties;
 
 public class Server {
@@ -21,7 +18,7 @@ public class Server {
             addRoutes();
             ServerRunner runner = new ServerRunner(portNumber, rootDirectory);
             runner.run();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+        } catch (FileNotFoundException e) {
             System.err.println("Error loading router. Make sure routesClass is defined in config.properties and implements com.rnelson.server.RouteInitializer");
         }
     }
@@ -32,19 +29,25 @@ public class Server {
         try {
             InputStream input = new FileInputStream(rootDirectory.getPath() + "/config.properties");
             config.load(input);
+            ServerConfig.rootDirectory = rootDirectory;
             ServerConfig.packageName = config.getProperty("packageName");
-            ServerConfig.routesClass = config.getProperty("routesClass");
+            ServerConfig.routesFile = config.getProperty("routesFile");
             input.close();
         } catch (Exception e) {
             System.err.println("Properties not found");
         }
     }
 
-    private static void addRoutes() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+    private static void addRoutes() throws FileNotFoundException {
         ServerConfig.router = new Router(ServerConfig.rootDirectory);
-        Class initializerClass = Class.forName(ServerConfig.routesClass);
-        RouteInitializer initializer = (RouteInitializer) initializerClass.newInstance();
-        initializer.initializeRoutes(ServerConfig.router);
+        File routesFile = new File(ServerConfig.rootDirectory + "/" + ServerConfig.routesFile);
+        FileHandler handler = new FileHandler(routesFile);
+        String routes = new String(handler.getFileContents());
+        String[] lines = routes.split("\n");
+        for (String line : lines) {
+            String[] splitRoute = line.split(" ");
+            ServerConfig.router.addRoute(splitRoute[0], splitRoute[1]);
+        }
     }
 }
 
