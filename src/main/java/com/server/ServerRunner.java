@@ -52,7 +52,6 @@ class ServerRunner implements Runnable {
     }
 
     private void respondToRequest (DataOutputStream out, BufferedReader in) throws IOException {
-        ServerConfig.rootDirectory = rootDirectory;
         byte[] response = new byte[0];
         Request request = new Request(getFullRequest(in));
         try {

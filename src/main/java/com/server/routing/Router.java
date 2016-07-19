@@ -85,8 +85,9 @@ public class Router {
     }
 
     public File[] listControllers() {
-        File controllersDirectory = new File(rootDirectory.getPath() + "/controllers");
-        return controllersDirectory.listFiles();
+        File controllersDirectory = new File(rootDirectory.getPath() + "/src/main/java/application/controller");
+        File[] controllersList = controllersDirectory.listFiles();
+        return controllersList;
     }
 
     public Controller getControllerForRequest(Route route) throws RouterException {
@@ -98,7 +99,7 @@ public class Router {
                 return controllerInstance(fileName);
             }
         }
-        throw new RouterException("Controller not found. Server is looking for '/controllers/" + expectedClassName + ".java' in the root directory.");
+        throw new RouterException("Controller not found. Server is looking for '/controller/" + expectedClassName + ".java' in the root directory.");
     }
 
     public Boolean userIsAuthorized(Route route, Credentials credentials) {
@@ -126,7 +127,7 @@ public class Router {
     }
 
     private String getPackageNameFromFileName(String fileName) {
-        return ServerConfig.packageName + ".controllers." + SharedUtilities.findMatch("^\\w+", fileName, 0);
+        return ServerConfig.packageName + ".controller." + SharedUtilities.findMatch("^\\w+", fileName, 0);
     }
 
     public String expectedControllerClass(Route route){
