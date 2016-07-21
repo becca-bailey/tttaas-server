@@ -30,7 +30,6 @@ class ServerRunner implements Runnable {
                 DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
                 BufferedReader in =
                         new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                System.out.println("Server is running on port " + serverPort + "\n");
 
                 respondToRequest(out, in);
                 clientSocket.close();
@@ -55,6 +54,7 @@ class ServerRunner implements Runnable {
         byte[] response = new byte[0];
         Request request = new Request(getFullRequest(in));
         try {
+            System.out.println("Request: " + request.method() + " " + request.url());
             Route route = routeForUrl(request.url());
             ResponseData responseData = new ResponseData(request, route);
             Controller controller = controllerForRoute(route);
