@@ -52,20 +52,25 @@ class ServerRunner implements Runnable {
 
     private void respondToRequest (DataOutputStream out, BufferedReader in) throws IOException {
         byte[] response = new byte[0];
-        Request request = new Request(getFullRequest(in));
-        try {
-            System.out.println("Request: " + request.method() + " " + request.url());
-            Route route = routeForUrl(request.url());
-            ResponseData responseData = new ResponseData(request, route);
-            Controller controller = controllerForRoute(route);
-            controller.sendResponseData(responseData);
-            Supplier<byte[]> controllerAction = getControllerActionForRequest(controller, request.method());
-            response = getResponse(controllerAction);
-        } catch (RouterException e) {
-            System.err.println(e.getMessage());
-            response = Response.notFound.getBytes();
+        String requestString = getFullRequest(in);
+        if (requestString == null || requestString == "null" || requestString.length() < 5) {
+            System.out.println("null request");
+        } else {
+            Request request = new Request(requestString);
+            try {
+                System.out.println("Request: " + request.method() + " " + request.url());
+                Route route = routeForUrl(request.url());
+                ResponseData responseData = new ResponseData(request, route);
+                Controller controller = controllerForRoute(route);
+                controller.sendResponseData(responseData);
+                Supplier<byte[]> controllerAction = getControllerActionForRequest(controller, request.method());
+                response = getResponse(controllerAction);
+            } catch (RouterException e) {
+                System.err.println(e.getMessage());
+                response = Response.notFound.getBytes();
+            }
+            out.write(response);
         }
-        out.write(response);
         out.close();
     }
 
