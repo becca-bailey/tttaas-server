@@ -23,29 +23,38 @@ class ServerRunner implements Runnable {
 
     @Override
     public void run() {
+        try {
+        ServerSocket serverSocket = new ServerSocket(serverPort);
         while (running) {
-            try {
-                ServerSocket serverSocket = new ServerSocket(serverPort);
-                Socket clientSocket = serverSocket.accept();
+            Socket clientSocket = serverSocket.accept();
+            clientSocket.setSoTimeout(100);
                 DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
+            try {
                 BufferedReader in =
                         new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
                 respondToRequest(out, in);
-                clientSocket.close();
-                serverSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch(Exception e) {
+                System.out.println(e.getStackTrace());
             }
+            clientSocket.close();
         }
-    }
+            serverSocket.close();
+        } catch (Exception e) {
+            System.out.println(e.getStackTrace());
+        }
+        }
+
 
     private String getFullRequest(BufferedReader in) throws IOException {
         StringBuilder request = new StringBuilder();
-        request.append(in.readLine());
-        request.append("\n");
-        while(in.ready()) {
-            request.append((char) in.read());
+        int mychar;
+        try {
+            while ((mychar = in.read()) != -1) {
+                request.append((char) mychar);
+            }
+        } catch(Exception e) {
+            return request.toString();
         }
         return request.toString();
     }
@@ -65,13 +74,12 @@ class ServerRunner implements Runnable {
                 controller.sendResponseData(responseData);
                 Supplier<byte[]> controllerAction = getControllerActionForRequest(controller, request.method());
                 response = getResponse(controllerAction);
-            } catch (RouterException e) {
-                System.err.println(e.getMessage());
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
                 response = Response.notFound.getBytes();
             }
             out.write(response);
         }
-        out.close();
     }
 
     private Route routeForUrl(String url) throws RouterException {
