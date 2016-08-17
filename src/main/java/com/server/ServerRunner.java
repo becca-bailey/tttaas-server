@@ -24,26 +24,20 @@ class ServerRunner implements Runnable {
     @Override
     public void run() {
         try {
-        ServerSocket serverSocket = new ServerSocket(serverPort);
-        while (running) {
-            Socket clientSocket = serverSocket.accept();
-            clientSocket.setSoTimeout(100);
+            ServerSocket serverSocket = new ServerSocket(serverPort);
+            while (running) {
+                Socket clientSocket = serverSocket.accept();
+                clientSocket.setSoTimeout(100);
                 DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
-            try {
-                BufferedReader in =
-                        new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
+                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 respondToRequest(out, in);
-            } catch(Exception e) {
-                System.out.println(e.getStackTrace());
+                clientSocket.close();
             }
-            clientSocket.close();
-        }
             serverSocket.close();
         } catch (Exception e) {
             System.out.println(e.getStackTrace());
         }
-        }
+    }
 
 
     private String getFullRequest(BufferedReader in) throws IOException {
