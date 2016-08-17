@@ -23,29 +23,31 @@ class ServerRunner implements Runnable {
 
     @Override
     public void run() {
-        while (running) {
-            try {
-                ServerSocket serverSocket = new ServerSocket(serverPort);
+        try {
+            ServerSocket serverSocket = new ServerSocket(serverPort);
+            while (running) {
                 Socket clientSocket = serverSocket.accept();
+                clientSocket.setSoTimeout(100);
                 DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
-                BufferedReader in =
-                        new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
+                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 respondToRequest(out, in);
                 clientSocket.close();
-                serverSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+            serverSocket.close();
+        } catch (Exception e) {
+            System.out.println(e.getStackTrace());
         }
     }
 
     private String getFullRequest(BufferedReader in) throws IOException {
         StringBuilder request = new StringBuilder();
-        request.append(in.readLine());
-        request.append("\n");
-        while(in.ready()) {
-            request.append((char) in.read());
+        int mychar;
+        try {
+            while ((mychar = in.read()) != -1) {
+                request.append((char) mychar);
+            }
+        } catch(Exception e) {
+            return request.toString();
         }
         return request.toString();
     }
