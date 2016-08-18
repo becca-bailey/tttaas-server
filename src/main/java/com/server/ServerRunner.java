@@ -9,6 +9,7 @@ import com.server.utilities.exceptions.RouterException;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.function.Supplier;
 
 class ServerRunner implements Runnable {
@@ -47,9 +48,7 @@ class ServerRunner implements Runnable {
             while ((mychar = in.read()) != -1) {
                 request.append((char) mychar);
             }
-        } catch(Exception e) {
-            return request.toString();
-        }
+        } catch(SocketTimeoutException e) { }
         return request.toString();
     }
 

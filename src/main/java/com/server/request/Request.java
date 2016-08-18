@@ -14,8 +14,8 @@ public class Request {
     private final String header;
 
     public Request(String fullRequestFromServer) {
-            this.request = fullRequestFromServer;
-            header = getRequestHeader();
+        this.request = fullRequestFromServer;
+        header = getRequestHeader();
     }
 
     public String url() {
