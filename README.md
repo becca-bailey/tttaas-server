@@ -1,4 +1,4 @@
-# Becca and Tom's Tic Tac Toe Server
+# Becca and Tom's Tic Tac Toe Server [![Build Status](https://travis-ci.org/beccanelson/tttaas-server.svg?branch=master)](https://travis-ci.org/beccanelson/tttaas-server)
 
 ## Dependencies:
 
