@@ -37,8 +37,12 @@ public class Request {
     public Map<String, String> getDecodedParameters() {
         RequestData data = new RequestData();
         if (hasParameters()) {
-            Parameters parameters = new Parameters(getEncodedParameters());
-            data.addData(parameters.getDecodedParameters());
+            try {
+                Parameters parameters = new Parameters(getEncodedParameters());
+                data.addData(parameters.getDecodedParameters());
+            } catch (NullPointerException e) {
+                System.out.println("invalid parameters");
+            }
         }
         return data.returnAllData();
     }
