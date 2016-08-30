@@ -6,6 +6,7 @@ import com.server.utilities.SharedUtilities;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +41,7 @@ public class Request {
             try {
                 Parameters parameters = new Parameters(getEncodedParameters());
                 data.addData(parameters.getDecodedParameters());
-            } catch (NullPointerException e) {
+            } catch (ArrayIndexOutOfBoundsException e) {
                 System.out.println("invalid parameters");
             }
         }
