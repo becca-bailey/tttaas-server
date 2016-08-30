@@ -1,19 +1,20 @@
 package com.server;
 
+import com.server.utilities.exceptions.ServerException;
+
 import java.io.File;
 
 public class Server {
-    private static File rootDirectory;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         ServerArguments arguments = new ServerArguments(args);
         int portNumber = arguments.getPortNumber();
-        rootDirectory = arguments.getRootDirectory();
         try {
+            File rootDirectory = arguments.getRootDirectory();
             ServerRunner runner = new ServerRunner(portNumber, rootDirectory);
             System.out.println("Server is running on port " + portNumber + "\n");
             runner.run();
-        } catch (Exception e) {
+        } catch (ServerException e) {
             e.printStackTrace();
         }
     }

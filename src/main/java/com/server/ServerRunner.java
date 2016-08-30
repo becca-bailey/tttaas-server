@@ -15,11 +15,9 @@ import java.util.function.Supplier;
 class ServerRunner implements Runnable {
     private final int serverPort;
     private Boolean running = true;
-    private final File rootDirectory;
 
     ServerRunner(int port, File rootDirectory) {
         this.serverPort = port;
-        this.rootDirectory = rootDirectory;
     }
 
     @Override
@@ -35,7 +33,7 @@ class ServerRunner implements Runnable {
                 clientSocket.close();
             }
             serverSocket.close();
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.println(e.getStackTrace());
         }
     }
@@ -48,14 +46,16 @@ class ServerRunner implements Runnable {
             while ((mychar = in.read()) != -1) {
                 request.append((char) mychar);
             }
-        } catch(SocketTimeoutException e) { }
+        } catch(SocketTimeoutException e) {
+            // Continue running server after socket timeout
+        }
         return request.toString();
     }
 
     private void respondToRequest (DataOutputStream out, BufferedReader in) throws IOException {
         byte[] response = new byte[0];
         String requestString = getFullRequest(in);
-        if (requestString == null || requestString == "null" || requestString.length() < 5) {
+        if (requestString.length() < 5) {
             System.out.println("null request");
         } else {
             Request request = new Request(requestString);
@@ -67,7 +67,7 @@ class ServerRunner implements Runnable {
                 controller.sendResponseData(responseData);
                 Supplier<byte[]> controllerAction = getControllerActionForRequest(controller, request.method());
                 response = getResponse(controllerAction);
-            } catch (Exception e) {
+            } catch (RouterException e) {
                 System.out.println(e.getMessage());
                 response = Response.notFound.getBytes();
             }
