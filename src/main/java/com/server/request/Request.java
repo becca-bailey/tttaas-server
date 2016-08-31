@@ -6,7 +6,6 @@ import com.server.utilities.SharedUtilities;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,7 +64,7 @@ public class Request {
         Map<String,String> headerFields = new HashMap<>();
         String[] headerLines = splitHeader();
         for (int i = 1; i < headerLines.length; i++) {
-            String[] fields = headerLines[i].split(":");
+            String[] fields = headerLines[i].split(": ");
             String parameter = fields[0];
             String options = fields[1].trim();
             headerFields.put(parameter, options);
