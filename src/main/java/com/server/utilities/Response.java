@@ -25,6 +25,7 @@ public class Response {
         statusCodes.put(405, http("405 Method Not Allowed"));
         statusCodes.put(418, http("418 I'm a teapot"));
         statusCodes.put(401, http("401 Not Authorized"));
+        statusCodes.put(400, http("400 Bad Request"));
 
         return statusCodes.get(status);
     }

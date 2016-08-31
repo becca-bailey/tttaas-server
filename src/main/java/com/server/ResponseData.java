@@ -16,6 +16,7 @@ public class ResponseData {
     public File requestedFile;
     public Boolean isAuthorized;
     public String requestedRange;
+    public Map<String,String> headers;
 
     public ResponseData() {
 
@@ -30,11 +31,14 @@ public class ResponseData {
         sendFile(route.getFile(ServerConfig.publicDirectory.getPath()));
         setRange(request.getRange());
         requestIsAuthorized(isAuthorized);
+        sendHeaders(request.parseHeaders());
     }
 
     public void sendRequestBody(String body) {
         this.requestBody = body;
     }
+
+    public void sendHeaders(Map<String,String> headers) { this.headers = headers; }
 
     public void sendParameters(Map<String, String> parameters) {
         this.parameters = parameters;
@@ -51,7 +55,6 @@ public class ResponseData {
     public void requestIsAuthorized(Boolean isAuthorized) {
         this.isAuthorized = isAuthorized;
     }
-
     private void setRange(String requestedRange) {
         this.requestedRange = requestedRange;
     }
